@@ -1,9 +1,13 @@
 import Fastify from "fastify";
+import formBody from "@fastify/formbody";
 import { db, initDB } from "./db.js";
 
 const app = Fastify({
   logger: true,
 });
+
+// Register form body parser for application/x-www-form-urlencoded
+await app.register(formBody);
 
 // Track if database is initialized
 let dbInitialized = false;

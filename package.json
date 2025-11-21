@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@fastify/formbody": "^7.4.0",
     "fastify": "^4.25.2",
     "lowdb": "^7.0.1"
   }
