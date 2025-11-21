@@ -32,3 +32,6 @@ yarn-error.log*
 
 # Turborepo
 .turbo
+
+# Database
+data/db.json

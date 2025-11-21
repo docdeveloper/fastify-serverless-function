@@ -3,7 +3,9 @@
   "repository": "https://github.com/vercel/examples.git",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "fastify": "^4.25.2"
+    "fastify": "^4.25.2",
+    "lowdb": "^7.0.1"
   }
 }
