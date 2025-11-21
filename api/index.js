@@ -16,6 +16,12 @@ async function ensureDB() {
   }
 }
 
+// Helper to validate user exists
+function validateUserExists(userId) {
+  const user = db.data.users.find((u) => u.id === userId);
+  return user !== undefined;
+}
+
 // Middleware to verify Bearer token
 const verifyToken = async (request, reply, done) => {
   const authHeader = request.headers.authorization;
@@ -77,6 +83,13 @@ app.get("/users/:userId", async (req, reply) => {
       .send({ error: "Not Found", message: "User not found" });
   }
 
+  // Don't expose admin users through this endpoint
+  if (user.role === "admin") {
+    return reply
+      .status(404)
+      .send({ error: "Not Found", message: "User not found" });
+  }
+
   return reply.status(200).send(user);
 });
 
@@ -118,6 +131,15 @@ app.post("/posts", async (req, reply) => {
 
   await ensureDB();
   await db.read();
+
+  // Validate that the user exists
+  if (!validateUserExists(userId)) {
+    return reply.status(400).send({
+      error: "Bad Request",
+      message: "Invalid userId: user does not exist",
+    });
+  }
+
   const newPost = {
     id: db.data.counters.postId++,
     title,
@@ -152,6 +174,14 @@ app.put("/posts/:postId", async (req, reply) => {
     });
   }
 
+  // Validate that the user exists
+  if (!validateUserExists(userId)) {
+    return reply.status(400).send({
+      error: "Bad Request",
+      message: "Invalid userId: user does not exist",
+    });
+  }
+
   db.data.posts[postIndex] = {
     id: postId,
     title,
@@ -175,6 +205,14 @@ app.patch("/posts/:postId", async (req, reply) => {
     return reply
       .status(404)
       .send({ error: "Not Found", message: "Post not found" });
+  }
+
+  // If userId is being updated, validate it exists
+  if (req.body.userId !== undefined && !validateUserExists(req.body.userId)) {
+    return reply.status(400).send({
+      error: "Bad Request",
+      message: "Invalid userId: user does not exist",
+    });
   }
 
   db.data.posts[postIndex] = {
