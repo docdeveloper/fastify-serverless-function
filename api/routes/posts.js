@@ -166,14 +166,4 @@ export default async function postsRoutes(fastify, options) {
     await db.write();
     return reply.status(200).send({ message: "Post deleted successfully" });
   });
-
-  // Get comments for a specific post
-  fastify.get("/posts/:postId/comments", async (req, reply) => {
-    await ensureDB(initDB);
-    await db.read();
-    const postId = parseInt(req.params.postId);
-    const postComments = db.data.comments.filter((c) => c.postId === postId);
-
-    return reply.status(200).send(postComments);
-  });
 }

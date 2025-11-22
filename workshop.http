@@ -1,0 +1,276 @@
+### Workshop: Using REST APIs for Technical Writers
+### This file contains all exercises from the workshop
+### Change the baseUrl to your deployment URL or use localhost:3000
+
+@baseUrl = http://localhost:3000
+# @baseUrl = https://your-deployment.vercel.app
+
+###############################################
+### PART 1: Introduction & Fundamentals
+###############################################
+
+### Exercise 1.1: Get a specific user
+GET {{baseUrl}}/users/1
+
+### Exercise 1.2: Get all posts
+GET {{baseUrl}}/posts
+
+### Exercise 1.3: Get comments for a post
+GET {{baseUrl}}/posts/1/comments
+
+###############################################
+### PART 2: Working with Different HTTP Methods
+###############################################
+
+### Exercise 2.1: Create a new post (POST)
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "My Workshop Post",
+  "body": "Learning about REST APIs is fun!",
+  "userId": 1
+}
+
+### Exercise 2.2: Try POST without Content-Type header (should fail)
+POST {{baseUrl}}/posts
+
+{
+  "title": "This will fail",
+  "body": "No Content-Type header",
+  "userId": 1
+}
+
+### Exercise 2.3: Create post with invalid userId (should fail validation)
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "Test Post",
+  "body": "Testing validation",
+  "userId": 999
+}
+
+### Exercise 3.1: Update entire post (PUT)
+PUT {{baseUrl}}/posts/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Updated Title",
+  "body": "Updated body",
+  "userId": 1
+}
+
+### Exercise 3.2: Partial update (PATCH) - only title
+PATCH {{baseUrl}}/posts/1
+Content-Type: application/json
+
+{
+  "title": "Only Title Changed"
+}
+
+### Exercise 4: Delete a post
+DELETE {{baseUrl}}/posts/1
+
+### Exercise 4.1: Delete same post again (should return 404)
+DELETE {{baseUrl}}/posts/1
+
+###############################################
+### PART 3: Authentication & Headers
+###############################################
+
+### Exercise 5.1: Get all users (public - no auth required)
+GET {{baseUrl}}/users
+
+### Exercise 5.2: Try to get admin users without auth (should fail)
+GET {{baseUrl}}/users/admin
+
+### Exercise 5.3: Get admin user by ID without auth (should return 404 - protected)
+GET {{baseUrl}}/users/3
+
+### Exercise 5.4: Request with multiple headers
+GET {{baseUrl}}/posts
+Accept: application/json
+User-Agent: TechWriterWorkshop/1.0
+
+###############################################
+### OAuth 2.0 Authentication Flow Exercise
+###############################################
+
+### Variables for OAuth exercises
+@clientId = workshop_client_12345
+@clientSecret = secret_abc123xyz789
+@tokenEndpoint = {{baseUrl}}/oauth/token
+@apiEndpoint = {{baseUrl}}/api/v1
+
+### STEP 1: Obtain Access Token
+# @name getToken
+POST {{tokenEndpoint}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{clientId}}&client_secret={{clientSecret}}&scope=read:data write:data
+
+### STEP 2: Extract the token from the response
+# The REST Client extension allows us to capture values from previous requests
+@accessToken = {{getToken.response.body.access_token}}
+@tokenType = {{getToken.response.body.token_type}}
+
+### STEP 3: Make an authenticated GET request - Get all users
+GET {{apiEndpoint}}/users
+Authorization: {{tokenType}} {{accessToken}}
+Accept: application/json
+
+### STEP 4: Get admin users with authentication
+GET {{baseUrl}}/users/admin
+Authorization: {{tokenType}} {{accessToken}}
+
+### STEP 5: Make an authenticated POST request - Create document
+POST {{apiEndpoint}}/documents
+Authorization: {{tokenType}} {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "My Workshop Document",
+  "content": "This was created using an OAuth token",
+  "category": "workshop"
+}
+
+### STEP 6: Check token information
+GET {{apiEndpoint}}/oauth/token/info
+Authorization: {{tokenType}} {{accessToken}}
+
+### STEP 7: Make request with invalid token (should fail with 401)
+GET {{apiEndpoint}}/users
+Authorization: Bearer invalid_token_example
+Accept: application/json
+
+###############################################
+### Additional Test Cases
+###############################################
+
+### Test: Create post with missing required fields (should fail)
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "Missing body and userId"
+}
+
+### Test: Update post with invalid userId (should fail)
+PUT {{baseUrl}}/posts/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "title": "Test",
+  "body": "Test body",
+  "userId": 999
+}
+
+### Test: Get non-existent user (should return 404)
+GET {{baseUrl}}/users/999
+
+### Test: Get non-existent post (should return 404)
+GET {{baseUrl}}/posts/999
+
+### Test: Get comments for non-existent post (should return empty array)
+GET {{baseUrl}}/posts/999/comments
+
+###############################################
+### PART 4: Comment Management Endpoints
+###############################################
+
+### Get all comments
+GET {{baseUrl}}/comments
+
+### Get a specific comment
+GET {{baseUrl}}/comments/1
+
+### Create a new comment
+POST {{baseUrl}}/comments
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "name": "Workshop Participant",
+  "email": "participant@workshop.com",
+  "body": "This is a test comment from the workshop!"
+}
+
+### Create comment with invalid postId (should fail)
+POST {{baseUrl}}/comments
+Content-Type: application/json
+
+{
+  "postId": 999,
+  "name": "Test User",
+  "email": "test@example.com",
+  "body": "This should fail - post doesn't exist"
+}
+
+### Create comment with missing fields (should fail)
+POST {{baseUrl}}/comments
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "name": "Test User"
+}
+
+### Update entire comment (PUT)
+PUT {{baseUrl}}/comments/1
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "name": "Updated Name",
+  "email": "updated@example.com",
+  "body": "This comment has been updated"
+}
+
+### Partial update comment (PATCH) - only body
+PATCH {{baseUrl}}/comments/1
+Content-Type: application/json
+
+{
+  "body": "Only the comment body was updated"
+}
+
+### Delete a comment
+DELETE {{baseUrl}}/comments/1
+
+### Try to delete non-existent comment (should return 404)
+DELETE {{baseUrl}}/comments/999
+
+###############################################
+### Summary of All Available Endpoints
+###############################################
+
+### Users
+# GET /users - Get all non-admin users
+# GET /users/:userId - Get specific user (excludes admin)
+# GET /users/admin - Get admin users (requires authentication)
+
+### Posts
+# GET /posts - Get all posts
+# GET /posts/:postId - Get specific post
+# POST /posts - Create new post (requires: title, body, userId)
+# PUT /posts/:postId - Update entire post (requires: title, body, userId)
+# PATCH /posts/:postId - Partially update post
+# DELETE /posts/:postId - Delete post
+
+### Comments
+# GET /comments - Get all comments
+# GET /comments/:commentId - Get specific comment
+# GET /posts/:postId/comments - Get comments for specific post
+# POST /comments - Create new comment (requires: postId, name, email, body)
+# PUT /comments/:commentId - Update entire comment (requires: postId, name, email, body)
+# PATCH /comments/:commentId - Partially update comment
+# DELETE /comments/:commentId - Delete comment
+
+### OAuth & Authentication
+# POST /oauth/token - Get access token (client_credentials flow)
+# GET /api/v1/users - Get all users including admin (requires auth)
+# POST /api/v1/documents - Create document (requires auth)
+# GET /api/v1/oauth/token/info - Get token information (requires auth)

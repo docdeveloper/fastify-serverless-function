@@ -67,9 +67,61 @@ DELETE /posts/{postId}
 
 ## Comments
 
+### Get all comments
+
+GET /comments
+
+### Get a specific comment
+
+GET /comments/{commentId}
+
 ### Get comments for a specific post
 
 GET /posts/{postId}/comments
+
+### Create a comment
+
+POST /comments
+
+Content-Type: application/json
+
+{ "postId": 1, "name": "Commenter Name", "email": "commenter@example.com",
+"body": "This is a comment on the post" }
+
+**Validation:**
+
+- All fields (postId, name, email, body) are required
+- postId must reference an existing post
+
+### Update an entire comment (PUT)
+
+PUT /comments/{commentId}
+
+Content-Type: application/json
+
+{ "postId": 1, "name": "Updated Name", "email": "updated@example.com", "body":
+"Updated comment body" }
+
+**Validation:**
+
+- All fields (postId, name, email, body) are required
+- postId must reference an existing post
+
+### Update part of a comment (PATCH)
+
+PATCH /comments/{commentId}
+
+Content-Type: application/json
+
+{ "body": "Only the body was updated" }
+
+**Validation:**
+
+- If postId is provided, it must reference an existing post
+
+### Delete a comment
+
+DELETE /comments/{commentId}
 
 ## Token
 

@@ -3,6 +3,7 @@ import formBody from "@fastify/formbody";
 import { db, initDB } from "./db.js";
 import usersRoutes from "./routes/users.js";
 import postsRoutes from "./routes/posts.js";
+import commentsRoutes from "./routes/comments.js";
 import oauthRoutes from "./routes/oauth.js";
 
 const app = Fastify({
@@ -55,6 +56,7 @@ app.get("/", async (req, reply) => {
 // Register route modules
 await app.register(usersRoutes, { initDB, verifyToken });
 await app.register(postsRoutes, { initDB });
+await app.register(commentsRoutes, { initDB });
 await app.register(oauthRoutes, { initDB, verifyToken });
 
 export default async function handler(req, reply) {
