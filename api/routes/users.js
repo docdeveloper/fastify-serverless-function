@@ -55,4 +55,42 @@ export default async function usersRoutes(fastify, options) {
 
     return reply.status(200).send(user);
   });
+
+  // Create a new user
+  fastify.post("/users", async (req, reply) => {
+    await ensureDB(initDB);
+    await db.read();
+
+    const { name, email } = req.body;
+
+    // Validate required fields
+    if (!name || !email) {
+      return reply.status(400).send({
+        error: "Bad Request",
+        message: "Missing required fields: name and email are required",
+      });
+    }
+
+    // Validate field types
+    if (typeof name !== "string" || typeof email !== "string") {
+      return reply.status(400).send({
+        error: "Bad Request",
+        message: "Invalid field types: name and email must be strings",
+      });
+    }
+
+    // Create new user with generated ID
+    const newUser = {
+      id: db.data.counters.userId,
+      name,
+      email,
+      role: "user",
+    };
+
+    db.data.users.push(newUser);
+    db.data.counters.userId++;
+    await db.write();
+
+    return reply.status(201).send(newUser);
+  });
 }

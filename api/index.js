@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import formBody from "@fastify/formbody";
-import { db, initDB } from "./db.js";
+import { db, initDB, resetDB } from "./db.js";
 import usersRoutes from "./routes/users.js";
 import postsRoutes from "./routes/posts.js";
 import commentsRoutes from "./routes/comments.js";
@@ -51,6 +51,22 @@ app.get("/", async (req, reply) => {
     .status(200)
     .type("application/json")
     .send({ message: "Welcome to the API for tech writers workshop" });
+});
+
+// Reset endpoint - resets database to default data (protected)
+app.post("/reset", { preHandler: verifyToken }, async (req, reply) => {
+  await ensureDB();
+  await resetDB();
+  dbInitialized = true; // Maintain initialization state
+  await db.read();
+  return reply.status(200).send({
+    message: "Database reset to default data",
+    data: {
+      users: db.data.users.length,
+      posts: db.data.posts.length,
+      comments: db.data.comments.length,
+    },
+  });
 });
 
 // Register route modules

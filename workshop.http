@@ -12,11 +12,32 @@
 ### Exercise 1.1: Get a specific user
 GET {{baseUrl}}/users/1
 
-### Exercise 1.2: Get all posts
+### Exercise 1.2: Create a new user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Alice Johnson",
+  "email": "alice@example.com"
+}
+
+### Exercise 1.3: Try to create user without required fields (should fail)
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Bob Smith"
+}
+
+### Exercise 1.4: Get all posts
 GET {{baseUrl}}/posts
 
-### Exercise 1.3: Get comments for a post
+### Exercise 1.5: Get comments for a post
 GET {{baseUrl}}/posts/1/comments
+
+### Exercise 1.6: Reset database to default data (requires authentication)
+POST {{baseUrl}}/reset
+Authorization: {{tokenType}} {{accessToken}}
 
 ###############################################
 ### PART 2: Working with Different HTTP Methods
@@ -251,6 +272,7 @@ DELETE {{baseUrl}}/comments/999
 # GET /users - Get all non-admin users
 # GET /users/:userId - Get specific user (excludes admin)
 # GET /users/admin - Get admin users (requires authentication)
+# POST /users - Create new user (requires: name, email)
 
 ### Posts
 # GET /posts - Get all posts
@@ -274,3 +296,6 @@ DELETE {{baseUrl}}/comments/999
 # GET /api/v1/users - Get all users including admin (requires auth)
 # POST /api/v1/documents - Create document (requires auth)
 # GET /api/v1/oauth/token/info - Get token information (requires auth)
+
+### Data Management
+# POST /reset - Reset database to default data (requires authentication)

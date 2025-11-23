@@ -43,7 +43,9 @@ const defaultData = {
   ],
   tokens: {},
   counters: {
+    userId: 4,
     postId: 3,
+    commentId: 4,
     token: 1,
   },
 };
@@ -58,4 +60,10 @@ async function initDB() {
   await db.write();
 }
 
-export { db, initDB };
+// Reset database to default data
+async function resetDB() {
+  db.data = JSON.parse(JSON.stringify(defaultData));
+  await db.write();
+}
+
+export { db, initDB, resetDB, defaultData };

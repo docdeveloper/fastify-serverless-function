@@ -20,6 +20,20 @@ Access to info about an admin user is blocked. It requires a token.
 
 Authorization: Bearer YOUR_TOKEN_HERE
 
+### Create a user
+
+POST /users
+
+Content-Type: application/json
+
+{ "name": "New User", "email": "newuser@example.com" }
+
+**Validation:**
+
+- name and email are required fields
+- Status: 201 Created, 400 Bad Request
+- Response: Created User object with generated ID
+
 ## Posts
 
 ### Get all posts
@@ -122,6 +136,23 @@ Content-Type: application/json
 ### Delete a comment
 
 DELETE /comments/{commentId}
+
+## Data Management
+
+### Reset data to default dataset
+
+POST /reset
+
+Authorization: Bearer YOUR_TOKEN_HERE
+
+Resets the entire database back to the default data set with initial users,
+posts, and comments.
+
+**Authentication:**
+
+- Requires valid Bearer token in Authorization header
+- Status: 200 OK, 401 Unauthorized
+- Response: Confirmation message with reset data summary
 
 ## Token
 
