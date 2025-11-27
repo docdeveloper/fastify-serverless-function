@@ -2,8 +2,8 @@
 ### This file contains all exercises from the workshop
 ### Change the baseUrl to your deployment URL or use localhost:3000
 
-@baseUrl = http://localhost:3000
-# @baseUrl = https://your-deployment.vercel.app
+# @baseUrl = http://localhost:3000
+@baseUrl = https://fastify-serverless-function-one-woad.vercel.app
 
 ###############################################
 ### PART 1: Introduction & Fundamentals
